@@ -32,6 +32,7 @@
   --remember-bg: #141a14;
   --reflect-bg:  #1a1420;
   --execute-bg:  #14181e;
+  --tab-bar-h:   52px;
 }
 
 html, body {
@@ -42,7 +43,11 @@ html, body {
   font-size: 13px;
   line-height: 1.6;
   overflow: hidden;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
 }
+
+button, [onclick] { -webkit-tap-highlight-color: transparent; }
 
 /* ── LAYOUT ── */
 
@@ -51,6 +56,112 @@ html, body {
   grid-template-rows: 38px 1fr;
   grid-template-columns: 1fr 260px 260px;
   height: 100vh;
+}
+
+/* ── MOBILE TAB BAR ── */
+
+.mobile-tab-bar {
+  display: none;
+}
+
+.mobile-tabs {
+  display: flex;
+  height: 100%;
+}
+
+.mobile-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+  min-height: 44px;
+}
+
+.mobile-tab.active { color: var(--amber); }
+.mobile-tab-icon { font-size: 18px; line-height: 1; }
+
+/* ── RESPONSIVE ── */
+
+/* Tablet (≤900px): collapse functions panel into tabs */
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: 1fr 220px;
+  }
+  .shell > .side-panel:last-child {
+    display: none;
+  }
+}
+
+/* Mobile (≤600px): single column with bottom tab bar */
+@media (max-width: 600px) {
+  .shell {
+    grid-template-rows: 44px 1fr;
+    grid-template-columns: 1fr;
+    height: 100dvh;
+    padding-bottom: calc(var(--tab-bar-h) + env(safe-area-inset-bottom));
+  }
+
+  .topbar {
+    height: 44px;
+    padding: 0 1rem;
+    gap: 0.8rem;
+  }
+
+  .logo { font-size: 10px; }
+  .logo-sub { display: none; }
+  .layer-indicator { display: none; }
+  .mode-toggle { margin-right: 0; }
+  .mode-btn { padding: 3px 10px; }
+
+  .main-panel {
+    grid-column: 1;
+    border-right: none;
+  }
+
+  /* Side panels hidden by default; shown when activated via JS */
+  .side-panel {
+    display: none;
+    position: fixed;
+    top: 44px;
+    left: 0; right: 0;
+    bottom: calc(var(--tab-bar-h) + env(safe-area-inset-bottom));
+    border-right: none;
+    z-index: 10;
+    background: var(--bg);
+    overflow-y: auto;
+  }
+
+  .mobile-tab-bar {
+    display: block;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: calc(var(--tab-bar-h) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    z-index: 50;
+  }
+
+  .input-area { padding: 0.6rem 1rem 0.8rem; }
+  .conv-area  { padding: 1rem; gap: 1.2rem; }
+  .event      { flex-wrap: wrap; }
+  .event-label { min-width: 4rem; }
+  .modal      { width: calc(100vw - 2rem); max-width: none; }
+  .editor-console { min-height: 100px; height: 28%; }
+  .quick-add  { padding: 0.6rem 0.8rem; }
+  .panel-body { padding: 0.6rem 0.8rem; }
 }
 
 /* ── TOPBAR ── */
@@ -940,7 +1051,20 @@ html, body {
 
 </div>
 
-<!-- MEMORY MODAL -->
+<!-- MOBILE TAB BAR -->
+<div class="mobile-tab-bar">
+  <div class="mobile-tabs">
+    <button class="mobile-tab active" id="mtab-chat" onclick="mobileTab('chat')">
+      <span class="mobile-tab-icon">💬</span>chat
+    </button>
+    <button class="mobile-tab" id="mtab-memory" onclick="mobileTab('memory')">
+      <span class="mobile-tab-icon">🧠</span>memory
+    </button>
+    <button class="mobile-tab" id="mtab-functions" onclick="mobileTab('functions')">
+      <span class="mobile-tab-icon">⚡</span>functions
+    </button>
+  </div>
+</div>
 <div class="modal-overlay" id="mem-modal">
   <div class="modal">
     <div class="modal-title">memory</div>
@@ -978,9 +1102,6 @@ html, body {
   </div>
 </div>
 
-</div>
-
-
 <script type="module">
 import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.6.0';
 
@@ -995,11 +1116,9 @@ let assistantFunctions = {};
 let viewMem = 'ws';
 let viewFn  = 'ws';
 
-
 let editingFn    = null;
 let embedder     = null;
 let currentFileHandle = null;
-
 
 // ── Embedder (for cascade search) ──
 async function initEmbedder() {
@@ -1089,17 +1208,11 @@ window.setMode = function(mode) {
     chatView.style.display = 'flex';
     chatBtn.classList.add('active');
     conv.scrollTop = conv.scrollHeight;
-    document.getElementById('chat-input').focus();
   } else if (mode === 'editor') {
     editorView.style.display = 'flex';
     editorBtn.classList.add('active');
-    document.getElementById('main-code-editor').focus();
   }
 };
-
-
-
-
 
 window.openEditorFile = function() {
   document.getElementById('editor-file-loader').click();
@@ -1272,7 +1385,6 @@ window.send = async function() {
   }
 
   btn.disabled = false;
-  input.focus();
 };
 
 // ── ADD MESSAGE ──
@@ -1627,13 +1739,69 @@ document.getElementById('chat-input').addEventListener('keydown', e => {
   }
 });
 
+// ── MOBILE TAB SWITCHING ──
+window.mobileTab = function(tab) {
+  const mainPanel = document.querySelector('.main-panel');
+  const sidePanels = document.querySelectorAll('.side-panel');
+  
+  if (!mainPanel || sidePanels.length < 2) return;
+
+  const memPanel = sidePanels[0];
+  const fnPanel = sidePanels[1];
+
+  // Update tab UI
+  document.querySelectorAll('.mobile-tab').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.getElementById('mtab-' + tab);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // Use inline JS styles to completely overwrite any conflicting CSS rules
+  if (tab === 'chat') {
+    memPanel.style.setProperty('display', 'none', 'important');
+    fnPanel.style.setProperty('display', 'none', 'important');
+    mainPanel.style.setProperty('display', 'flex', 'important');
+    
+    setMode('chat');
+    
+    setTimeout(() => {
+      const convArea = document.getElementById('conv-area');
+      if (convArea) convArea.scrollTop = convArea.scrollHeight;
+    }, 50);
+
+  } else if (tab === 'memory') {
+    mainPanel.style.setProperty('display', 'none', 'important');
+    fnPanel.style.setProperty('display', 'none', 'important');
+    memPanel.style.setProperty('display', 'flex', 'important');
+    setMemView('ws');
+
+  } else if (tab === 'functions') {
+    mainPanel.style.setProperty('display', 'none', 'important');
+    memPanel.style.setProperty('display', 'none', 'important');
+    fnPanel.style.setProperty('display', 'flex', 'important');
+    setFnView('ws');
+  }
+};
+
+// Reset desktop layout dynamically if rotated/resized
+window.addEventListener('resize', () => {
+  const mainPanel = document.querySelector('.main-panel');
+  const sidePanels = document.querySelectorAll('.side-panel');
+  
+  if (window.innerWidth > 600) {
+    if (mainPanel) mainPanel.style.removeProperty('display');
+    sidePanels.forEach(p => p.style.removeProperty('display'));
+  } else {
+    const activeTab = document.querySelector('.mobile-tab.active');
+    if (activeTab) {
+      window.mobileTab(activeTab.id.replace('mtab-', ''));
+    }
+  }
+});
+
 // ── INIT ──
 window.addEventListener('load', () => {
-  document.getElementById('chat-input').focus();
   loadState();
 });
 
 setInterval(loadState, 15000);
 </script>
 </body>
-</html>
