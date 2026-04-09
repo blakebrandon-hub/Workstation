@@ -14,21 +14,6 @@ Workstation has two distinct but integrated layers:
 
 ---
 
-## Architecture
-
-```
-index.html          — Browser UI
-server.py           — Flask app: routes for both the workstation and the assistant
-engine.py           — Workspace class: sandbox execution + Supabase memory
-assistant.py        — Assistant: system prompt, tag parser, memory, action router
-```
-
-**External services:**
-- [Google Gemini](https://ai.google.dev/) — language model (`gemini-3.1-flash-lite-preview`) and embeddings (`text-embedding-004`)
-- [Supabase](https://supabase.com/) — persistent storage for memory, functions, conversation history, and summaries
-
----
-
 ## Features
 
 ### Python Sandbox
@@ -56,6 +41,29 @@ The assistant communicates via a tag-based protocol. Its raw output is parsed fo
 
 ### Long-term Memory (Summarization + Embeddings)
 The assistant's conversation is kept at a rolling window of 20 messages. When older messages overflow, they're batched and summarized automatically using Gemini (every 20 messages), and up to 4 summaries are kept. Summaries are embedded with `text-embedding-004` and stored for semantic (cascade) search.
+
+---
+
+# Screenshots
+
+<img width="1366" height="768" alt="Screenshot 2026-04-09 010248" src="https://github.com/user-attachments/assets/14745c7d-4b36-4050-8e3d-fc56edfb25b3" />
+
+<img width="1366" height="768" alt="Screenshot 2026-04-09 010306" src="https://github.com/user-attachments/assets/8590cf14-7a27-499d-99f9-c91b1c86a91e" />
+
+---
+
+## Architecture
+
+```
+index.html          — Browser UI
+server.py           — Flask app: routes for both the workstation and the assistant
+engine.py           — Workspace class: sandbox execution + Supabase memory
+assistant.py        — Assistant: system prompt, tag parser, memory, action router
+```
+
+**External services:**
+- [Google Gemini](https://ai.google.dev/) — language model (`gemini-3.1-flash-lite-preview`) and embeddings (`text-embedding-004`)
+- [Supabase](https://supabase.com/) — persistent storage for memory, functions, conversation history, and summaries
 
 ---
 
