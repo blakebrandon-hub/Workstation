@@ -1,8 +1,37 @@
 # Workstation
 
-A personal AI assistant platform combining a sandboxed Python execution environment with a Gemini-powered conversational assistant. Built with Flask and backed by Supabase.
+A collaborative AI programming environment with dual interfaces: chat with Gemini conversationally or code directly in the built-in Python editor. The AI assistant operates through a tag-based protocol (`think:`, `execute:`, `remember:`, `cascade:`), orchestrating code execution, memory management, and semantic search. All interactions persist in a shared workspace with functions, key-value memory, file storage, and automatic conversation archival with vector embeddings.
+
+**Two ways to interact:**
+- **Chat with the AI assistant** — describe what you want; they write and execute the code
+- **Use the workstation directly** — write code in the editor, run it in the interpreter, or call the REST API
+
+Both interfaces share the same persistent workspace. Everything remembers.
 
 ---
+
+## Overview
+
+### The Assistant Layer
+A Gemini-powered conversational agent that expresses actions through structured tags:
+- `think:` — internal reasoning
+- `execute:` — runs Python code in the sandbox
+- `remember:` / `forget:` — manages persistent key-value memory
+- `write_function:` / `invoke:` — creates and calls reusable functions
+- `cascade:` — searches semantic memory (embeddings)
+- `reflect:` — logs observations
+
+The assistant's conversation auto-summarizes (every 20 messages) and embeds for semantic search.
+
+### The Workstation Layer
+A manual, API-driven Python sandbox underneath Sofia:
+- Code editor and interpreter in the browser
+- Persistent key-value memory (Supabase)
+- Reusable function library
+- File system access
+- Full REST API for programmatic control
+
+When Sofia executes code, she's calling the same workstation you can drive manually.
 
 ## Overview
 
