@@ -21,7 +21,7 @@ A Gemini-powered conversational agent that expresses actions through structured 
 - `cascade:` — searches semantic memory (embeddings)
 - `reflect:` — logs observations
 
-The assistant's conversation auto-summarizes (every 20 messages) and embeds for semantic search.
+Sofia's conversation auto-summarizes (every 20 messages) and embeds for semantic search.
 
 ### The Workstation Layer
 A manual, API-driven Python sandbox underneath Sofia:
@@ -31,15 +31,15 @@ A manual, API-driven Python sandbox underneath Sofia:
 - File system access
 - Full REST API for programmatic control
 
-When Sofia executes code, she's calling the same workstation you can drive manually.
+When the assistant executes code, she's calling the same workstation you can drive manually.
 
-## Overview
+---
 
-Workstation has two distinct but integrated layers:
+## Screenshots
 
-**The Workstation** is a manual, API-driven workspace: a Python sandbox with persistent key-value memory and a reusable function library. You interact with it directly via REST endpoints — run code, store facts, define functions, invoke them later.
+<img width="1366" height="768" alt="Screenshot 2026-04-09 010248" src="https://github.com/user-attachments/assets/c7bd6722-166f-4ef3-b8e1-ff618e17572e" />
 
-**The Assistant** is the AI layer: a Gemini-powered conversational agent that lives on top of the workstation. It can think, remember, write and run code, reflect on results, and search its own memory — all expressed through a structured tag protocol embedded in its responses.
+<img width="1366" height="768" alt="Screenshot 2026-04-09 010306" src="https://github.com/user-attachments/assets/bc785bfe-3b74-4f7e-ae78-71e75734b523" />
 
 ---
 
@@ -70,14 +70,6 @@ The assistant communicates via a tag-based protocol. Its raw output is parsed fo
 
 ### Long-term Memory (Summarization + Embeddings)
 The assistant's conversation is kept at a rolling window of 20 messages. When older messages overflow, they're batched and summarized automatically using Gemini (every 20 messages), and up to 4 summaries are kept. Summaries are embedded with `text-embedding-004` and stored for semantic (cascade) search.
-
----
-
-# Screenshots
-
-<img width="1366" height="768" alt="Screenshot 2026-04-09 010248" src="https://github.com/user-attachments/assets/14745c7d-4b36-4050-8e3d-fc56edfb25b3" />
-
-<img width="1366" height="768" alt="Screenshot 2026-04-09 010306" src="https://github.com/user-attachments/assets/8590cf14-7a27-499d-99f9-c91b1c86a91e" />
 
 ---
 
