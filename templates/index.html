@@ -1004,13 +1004,15 @@ let currentFileHandle = null;
 // ── Embedder (for cascade search) ──
 async function initEmbedder() {
   try {
-    embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+    const { env } = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.6.0');
+    env.allowLocalModels = false;
+    env.useBrowserCache = true;
+    embedder = await pipeline('feature-extraction', 'Xenova/paraphrase-multilingual-mpnet-base-v2');
     console.log('✓ Embedder ready');
   } catch (err) {
     console.warn('Embedder unavailable:', err);
   }
 }
-initEmbedder();
 
 async function embed(text) {
   if (!embedder) return null;
