@@ -1,4 +1,4 @@
-# Workstation
+# Workstation v1.0
 
 A personal AI assistant platform combining a sandboxed Python execution environment with a Gemini-powered conversational assistant. Built with Flask and backed by Supabase.
 
