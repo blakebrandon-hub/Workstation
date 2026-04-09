@@ -279,7 +279,5 @@ $$;
 ---
 
 ## Security Notes
-
-- **API keys are currently hardcoded** in `engine.py` and `assistant.py`. Move them to environment variables before any deployment.
 - The Python sandbox uses a whitelist of safe builtins and allowed packages, but `open` and `subprocess` are included — tighten these if deploying in a multi-user context.
 - CORS is enabled globally via `flask-cors`. Restrict origins for production use.
