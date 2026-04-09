@@ -3,6 +3,7 @@ Workspace Engine — memory, functions, sandbox. No AI.
 """
 
 import io
+import os
 import re
 import sys
 import contextlib
@@ -15,7 +16,7 @@ from supabase import create_client, Client
 def _get_db() -> Client:
     SUPABASE_URL = os.environ.get("SUPABASE_URL")
     SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-    return create_client(url, key)
+    return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
